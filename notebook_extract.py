@@ -130,10 +130,14 @@ def extract_contextual_embedding_generator_generator(positional_embeddings: bool
 
         input_dim = embed_dim
         for i, context in enumerate(contexts):
-            if context in ["lstm", "gru", "bidirectional_lstm", "bidirectional_gru"]:
+            if context in ["lstm", "gru"]:
                 units = trial.suggest_int(f"rnn_units_{i}", 32, 512)
                 extract_contextual_embeddings.add(item_dict[context](units))
                 input_dim = units
+            elif context in ["bidirectional_lstm", "bidirectional_gru"]:
+                units = trial.suggest_int(f"rnn_units_{i}", 32, 512)
+                extract_contextual_embeddings.add(item_dict[context](units))
+                input_dim = units * 2
             elif context == "conv1d":
                 filters = trial.suggest_int(f"cnn_filters_{i}", 32, 512)
                 kernel_size = trial.suggest_int(f"cnn_kernel_size_{i}", 1, 5, step=2)

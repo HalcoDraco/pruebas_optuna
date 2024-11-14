@@ -1,0 +1,38 @@
+Bootstrap: docker
+From: nvidia/cuda:12.2.2-cudnn8-runtime-ubuntu22.04
+
+%setup
+    mkdir $SINGULARITY_ROOTFS/optuna_container_files
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+    apt update --fix-missing
+    apt-get update --fix-missing
+
+    apt install software-properties-common -y
+    add-apt-repository ppa:deadsnakes/ppa -y
+    apt-get install -y python3.11
+    apt install -y curl
+
+    curl -O https://bootstrap.pypa.io/get-pip.py
+    python3.11 get-pip.py
+
+    python3.11 -m pip install --upgrade pip
+    python3.11 -m pip install tensorflow[and-cuda]==2.16.1 pandas scikit-learn optuna nltk matplotlib seaborn
+    python3.11 -c "import nltk; nltk.download('wordnet', download_dir='/optuna_container_files/nltk_data')"
+
+    python3.11 -m pip cache purge
+    apt-get clean
+    apt-get autoclean
+    rm -rf get-pip.py
+    rm -rf /var/lib/apt/lists/*
+
+%labels
+    Author Pablo Gonzalez Monfort
+    Version v0.0.1
+
+%help
+    "Pasa como parámetro un fichero .py"
+
+%apprun launch_optuna_file
+    python3.11 "$@"

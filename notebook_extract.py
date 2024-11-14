@@ -129,19 +129,19 @@ def extract_contextual_embedding_generator_generator(positional_embeddings: bool
             extract_contextual_embeddings.add(Embedding(vocab_size, embed_dim, mask_zero=mask_zero))
 
         input_dim = embed_dim
-        for context in contexts:
+        for i, context in enumerate(contexts):
             if context in ["lstm", "gru", "bidirectional_lstm", "bidirectional_gru"]:
-                units = trial.suggest_int(f"{context}_units", 32, 512)
+                units = trial.suggest_int(f"rnn_units_{i}", 32, 512)
                 extract_contextual_embeddings.add(item_dict[context](units))
                 input_dim = units
             elif context == "conv1d":
-                filters = trial.suggest_int(f"{context}_filters", 32, 512)
-                kernel_size = trial.suggest_int(f"{context}_kernel_size", 1, 5, step=2)
+                filters = trial.suggest_int(f"cnn_filters_{i}", 32, 512)
+                kernel_size = trial.suggest_int(f"cnn_kernel_size_{i}", 1, 5, step=2)
                 extract_contextual_embeddings.add(item_dict[context](filters, kernel_size))
                 input_dim = filters
             elif context == "transformer":
-                num_heads_pow2 = trial.suggest_int(f"{context}_num_heads", 0, 3)
-                ff_dim = trial.suggest_int(f"{context}_ff_dim", 32, 512)
+                num_heads_pow2 = trial.suggest_int(f"transformer_num_heads_pow2_{i}", 0, 3)
+                ff_dim = trial.suggest_int(f"transformer_ff_dim_{i}", 32, 512)
                 extract_contextual_embeddings.add(item_dict[context](input_dim, 2**num_heads_pow2, ff_dim))
 
         return extract_contextual_embeddings

@@ -120,7 +120,7 @@ def experiment(train_data,
     training_length = len(train_data)
     validation_length = len(val_data)
     train_dataset = tf.data.Dataset.from_tensor_slices((train_pad_sequences, train_encoded_labels, sample_weight)).shuffle(training_length, reshuffle_each_iteration=True).batch(batch_size)
-    val_dataset = tf.data.Dataset.from_tensor_slices((val_pad_sequences, val_encoded_labels)).shuffle(validation_length).batch(batch_size)
+    val_dataset = tf.data.Dataset.from_tensor_slices((val_pad_sequences, val_encoded_labels)).shuffle(validation_length, reshuffle_each_iteration=True).batch(batch_size)
 
     vocab_size = data_processor.get_vocab_size()
 
@@ -203,7 +203,7 @@ def extract_contextual_embedding_generator_generator(positional_embeddings: bool
                 input_dim = filters
             elif context == "transformer":
                 num_heads_pow2 = trial.suggest_int(f"transformer_num_heads_pow2_{i}", 0, 3)
-                ff_dim = trial.suggest_int(f"transformer_ff_dim_{i}", 32, 512)
+                ff_dim = trial.suggest_int(f"transformer_ff_dim_{i}", 32, 4096)
                 extract_contextual_embeddings.add(item_dict[context](input_dim, 2**num_heads_pow2, ff_dim))
 
         return extract_contextual_embeddings
